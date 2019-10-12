@@ -1,0 +1,42 @@
+{
+    "name": "metallizzer/laravel-bench",
+    "description": "Benchmark tool for Laravel",
+    "keywords": [
+        "laravel",
+        "benchmark"
+    ],
+    "homepage": "https://github.com/Metallizzer/laravel-bench",
+    "license": "MIT",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Oleg Petrov",
+            "email": "oleg@devastator.ru",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=7.0",
+        "illuminate/support": "^5.5|^6"
+    },
+    "require-dev": {
+        "laravel/framework": "6.x"
+    },
+    "autoload": {
+        "psr-4": {
+            "Metallizzer\\Bench\\": "src/"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Metallizzer\\Bench\\BenchServiceProvider"
+            ]
+        }
+    }
+}
