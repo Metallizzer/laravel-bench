@@ -7,15 +7,56 @@ use ReflectionMethod;
 
 class Runner
 {
+    /**
+     * List of methods for the selected benchmark.
+     *
+     * @var array
+     */
     protected $methods = [];
-    protected $benchmark;
-    protected $time;
-    protected $memory;
-    protected $method;
-    protected $benchmarks = [];
-    protected $fastest    = [];
-    protected $slowest    = [];
 
+    /**
+     * The benchmark instance.
+     *
+     * @var AbstractBench
+     */
+    protected $benchmark;
+
+    /**
+     * @var float
+     */
+    protected $time;
+
+    /**
+     * @var float
+     */
+    protected $memory;
+
+    /**
+     * Statistics of running benchmarks.
+     *
+     * @var array
+     */
+    protected $benchmarks = [];
+
+    /**
+     * The fastest method and subject.
+     *
+     * @var array
+     */
+    protected $fastest = [];
+
+    /**
+     * The slowest method and subject.
+     *
+     * @var array
+     */
+    protected $slowest = [];
+
+    /**
+     * Create runner instance.
+     *
+     * @param AbstractBench $benchmark
+     */
     public function __construct(AbstractBench $benchmark)
     {
         $this->benchmark = $benchmark;
@@ -24,16 +65,27 @@ class Runner
         });
     }
 
+    /**
+     * Run the benchmark.
+     *
+     * @return $this
+     */
     public function run()
     {
         $this->benchmarks = $this->fastest = $this->slowest = [];
 
         $this->benchmark->runBefore();
-        $this->runBenchmarks();
-        $this->calculatePercentage();
+        $this->runBenchmarks()->calculatePercentage();
         $this->benchmark->runAfter();
+
+        return $this;
     }
 
+    /**
+     * Get stats of completed benchmarks.
+     *
+     * @return array
+     */
     public function getStats()
     {
         return [
@@ -49,6 +101,11 @@ class Runner
         ];
     }
 
+    /**
+     * Run all benchmark methods.
+     *
+     * @return $this
+     */
     protected function runBenchmarks()
     {
         foreach ($this->methods as $method) {
@@ -71,7 +128,7 @@ class Runner
                     $result = $reflection->invoke($this->benchmark, $subject);
                 }
 
-                $this->end();
+                $this->stop();
 
                 $this->benchmarks[$method]['subjects'][$key] = [
                     'return' => $return,
@@ -87,36 +144,66 @@ class Runner
 
             $this->updatePeaks('method', $this->benchmarks[$method]['time'], $this->benchmarks[$method]['memory']);
         }
+
+        return $this;
     }
 
+    /**
+     * Calculate the percentage of runtime and used memory of running benchmarks.
+     *
+     * @return $this
+     */
     protected function calculatePercentage()
     {
         foreach ($this->benchmarks as &$method) {
-            $this->setPercentage('fastest', 'method', 'time', $method);
-            $this->setPercentage('fastest', 'method', 'memory', $method);
-            $this->setPercentage('slowest', 'method', 'time', $method);
-            $this->setPercentage('slowest', 'method', 'memory', $method);
+            $this->setPercentage('fastest', 'method', 'time', $method)
+                ->setPercentage('fastest', 'method', 'memory', $method)
+                ->setPercentage('slowest', 'method', 'time', $method)
+                ->setPercentage('slowest', 'method', 'memory', $method);
 
             $method['grade'] = ($method['time'] - $this->fastest['method']['time']) / ($this->slowest['method']['time'] - $this->fastest['method']['time']);
 
             foreach ($method['subjects'] as &$subject) {
-                $this->setPercentage('fastest', 'subject', 'time', $subject);
-                $this->setPercentage('fastest', 'subject', 'memory', $subject);
-                $this->setPercentage('slowest', 'subject', 'time', $subject);
-                $this->setPercentage('slowest', 'subject', 'memory', $subject);
+                $this->setPercentage('fastest', 'subject', 'time', $subject)
+                    ->setPercentage('fastest', 'subject', 'memory', $subject)
+                    ->setPercentage('slowest', 'subject', 'time', $subject)
+                    ->setPercentage('slowest', 'subject', 'memory', $subject);
 
                 $subject['grade'] = ($subject['time'] - $this->fastest['subject']['time']) / ($this->slowest['subject']['time'] - $this->fastest['subject']['time']);
             }
         }
+
+        return $this;
     }
 
+    /**
+     * Set the percentage of runtime and used memory of a method or subject.
+     *
+     * @param string $speed   fastest or slowest
+     * @param string $type    method or subject
+     * @param string $key     time or memory
+     * @param array  &$return
+     *
+     * @return $this
+     */
     protected function setPercentage($speed, $type, $key, &$return)
     {
         $return['percent'][$speed][$key] = empty($this->{$speed}[$type][$key])
             ? 0
             : $return[$key] / $this->{$speed}[$type][$key] * 100;
+
+        return $this;
     }
 
+    /**
+     * Update the fastest and slowest values of runtime and used memory of running methods and subjects.
+     *
+     * @param string $type   method or subject
+     * @param float  $time   execution time
+     * @param int    $memory memory usage
+     *
+     * @return $this
+     */
     protected function updatePeaks($type, $time, $memory)
     {
         $this->fastest[$type] = [
@@ -128,15 +215,23 @@ class Runner
             'time'   => max($this->slowest[$type]['time'] ?? $time, $time),
             'memory' => max($this->slowest[$type]['memory'] ?? $memory, $memory),
         ];
+
+        return $this;
     }
 
+    /**
+     * Start test measure.
+     */
     protected function start()
     {
         $this->time   = microtime(true);
         $this->memory = memory_get_usage();
     }
 
-    protected function end()
+    /**
+     * Stop test measure.
+     */
+    protected function stop()
     {
         $this->time   = microtime(true) - $this->time;
         $this->memory = max(0, memory_get_usage() - $this->memory);

@@ -11,10 +11,32 @@ use ReflectionClass;
 
 class Bench
 {
+    /**
+     * The Laravel application instance.
+     *
+     * @var \Illuminate\Foundation\Application
+     */
     protected $app;
+
+    /**
+     * The array of benchmarks.
+     *
+     * @var array|null
+     */
     protected $benchmarks;
+
+    /**
+     * The array of active benchmarks paths.
+     *
+     * @var array|null
+     */
     protected $paths;
 
+    /**
+     * Create a new class instance.
+     *
+     * @param \Illuminate\Foundation\Application $app
+     */
     public function __construct(Application $app)
     {
         set_time_limit(config('bench.max_execution_time'));
@@ -30,6 +52,13 @@ class Bench
         $this->getBenchmarks();
     }
 
+    /**
+     * Set the active benchmarks paths.
+     *
+     * @param array $paths
+     *
+     * @return $this
+     */
     public function setPaths($paths)
     {
         $paths = array_unique(Arr::wrap($paths));
@@ -38,8 +67,15 @@ class Bench
         $this->paths      = array_filter($paths, function ($path) {
             return is_dir($path);
         });
+
+        return $this;
     }
 
+    /**
+     * Get a list of active benchmarks from all registered paths.
+     *
+     * @return array|null
+     */
     public function getBenchmarks()
     {
         if (null !== $this->benchmarks) {
@@ -72,6 +108,13 @@ class Bench
         return $this->benchmarks;
     }
 
+    /**
+     * Run the given benchmark.
+     *
+     * @param string $benchmark the benchmark class
+     *
+     * @return array
+     */
     public function run($benchmark)
     {
         $benchmarks = $this->getBenchmarks();

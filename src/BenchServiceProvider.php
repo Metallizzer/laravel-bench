@@ -39,6 +39,9 @@ class BenchServiceProvider extends ServiceProvider
         $this->registerRoutes();
     }
 
+    /**
+     * Register the package routes.
+     */
     protected function registerRoutes()
     {
         if ($this->app->routesAreCached()) {
