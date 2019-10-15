@@ -12,6 +12,13 @@ use ReflectionClass;
 class Bench
 {
     /**
+     * The package version.
+     *
+     * @var string
+     */
+    const VERSION = '1.1.0';
+
+    /**
      * The Laravel application instance.
      *
      * @var \Illuminate\Foundation\Application
@@ -128,5 +135,15 @@ class Bench
         $runner->run();
 
         return $runner->getStats();
+    }
+
+    /**
+     * Get the version number of the package.
+     *
+     * @return string
+     */
+    public function version()
+    {
+        return static::VERSION;
     }
 }
