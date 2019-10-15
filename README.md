@@ -63,7 +63,7 @@ php artisan bench:run
 Use with passing benchmark class name
 
 ```bash
-php artisan bench:run --benchmark=Benchmark\Class
+php artisan bench:run --benchmark="Benchmark\Class"
 ```
 
 To run all available benchmarks just issue
