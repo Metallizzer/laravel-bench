@@ -14,7 +14,7 @@
                     </div>
 
                     <div class="float-left badge badge-dark position-relative">{{ $method }}</div>
-                    <div class="float-right badge badge-dark position-relative">+{{ (int) $benchmark['percent']['fastest']['time'] }}%</div>
+                    <div class="float-right badge badge-dark position-relative">+{{ (int) $benchmark['percent']['fastest']['time'] - 100 }}%</div>
                 </div>
 
                 <div id="collapse{{ $loop->iteration }}" class="collapse" aria-labelledby="heading{{ $loop->iteration }}" data-parents="#accordionBench">

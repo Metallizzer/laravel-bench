@@ -7,7 +7,7 @@
 
     <meta name="robots" content="noindex, nofollow">
 
-    <title>bench{{ config('app.name') ? ' - ' . config('app.name') : '' }}</title>
+    <title>Bench{{ config('app.name') ? ' - ' . config('app.name') : '' }}</title>
 
     <!-- Style sheets-->
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
@@ -54,7 +54,7 @@
 
                                         <button type="submit" class="btn btn-primary my-1">Run</button>
                                     </form>
-                                    
+
                                     @yield('button')
                                 </div>
 

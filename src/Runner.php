@@ -60,9 +60,7 @@ class Runner
     public function __construct(AbstractBench $benchmark)
     {
         $this->benchmark = $benchmark;
-        $this->methods   = array_filter(get_class_methods($this->benchmark), function ($method) {
-            return strpos($method, 'bench') === 0;
-        });
+        $this->methods   = $benchmark->getMethods();
     }
 
     /**
@@ -75,8 +73,12 @@ class Runner
         $this->benchmarks = $this->fastest = $this->slowest = [];
 
         $this->benchmark->runBefore();
+        event('bench.run_before', $this->benchmark);
+
         $this->runBenchmarks()->calculatePercentage();
+
         $this->benchmark->runAfter();
+        event('bench.run_after', $this->benchmark);
 
         return $this;
     }
@@ -88,16 +90,20 @@ class Runner
      */
     public function getStats()
     {
+        $benchmarks = collect($this->benchmarks);
+
         return [
             'class'       => get_class($this->benchmark),
             'name'        => $this->benchmark->getName(),
             'description' => $this->benchmark->getDescription(),
             'loops'       => [
                 'base'  => $this->benchmark->getLoops(),
-                'total' => $this->benchmark->getLoops() * count($this->benchmark->getSubjects()) * count($this->methods),
+                'total' => $this->benchmark->getLoops() * count($this->benchmark->getMethods()) * count($this->benchmark->getSubjects()),
             ],
             'subjects'   => $this->benchmark->getSubjects(),
             'benchmarks' => $this->benchmarks,
+            'fastest'    => $this->fastest,
+            'slowest'    => $this->slowest,
         ];
     }
 
@@ -109,6 +115,8 @@ class Runner
     protected function runBenchmarks()
     {
         foreach ($this->methods as $method) {
+            event('bench.method_started', [$method]);
+
             $this->benchmarks[$method] = [
                 'time'     => 0,
                 'memory'   => 0,
@@ -118,6 +126,8 @@ class Runner
             $reflection = new ReflectionMethod(get_class($this->benchmark), $method);
 
             foreach ($this->benchmark->getSubjects() as $key => $subject) {
+                event('bench.subject_started', [$subject, $method]);
+
                 $return = $reflection->invoke($this->benchmark, $subject);
 
                 unset($result);
@@ -140,9 +150,13 @@ class Runner
                 $this->benchmarks[$method]['memory'] += $this->memory;
 
                 $this->updatePeaks('subject', $this->time, $this->memory);
+
+                event('bench.subject_completed', [$subject, $method]);
             }
 
             $this->updatePeaks('method', $this->benchmarks[$method]['time'], $this->benchmarks[$method]['memory']);
+
+            event('bench.method_completed', $method);
         }
 
         return $this;

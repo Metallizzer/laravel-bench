@@ -1,0 +1,66 @@
+<?php
+
+namespace DummyNamespace;
+
+use Metallizzer\Bench\Benchmarks\AbstractBench;
+
+class DummyClass extends AbstractBench
+{
+    /**
+     * The benchmark name.
+     *
+     * @var string
+     */
+    public $name = '';
+
+    /**
+     * The benchmark description.
+     *
+     * @var string
+     */
+    public $description = '';
+
+    /**
+     * Number of benchmark loop cycles.
+     *
+     * @var int
+     */
+    public $loops = 1000;
+
+    /**
+     * Subjects used during benchmarking.
+     *
+     * @var array
+     */
+    public $subjects = [];
+
+    /**
+     * This method is executed before the benchmark starts.
+     *
+     * @return mixed
+     */
+    public function runBefore()
+    {
+    }
+
+    /**
+     * This method is executed after the benchmark ends.
+     *
+     * @return mixed
+     */
+    public function runAfter()
+    {
+    }
+
+    public function benchOne($subject)
+    {
+    }
+
+    public function benchTwo($subject)
+    {
+    }
+
+    public function benchThree($subject)
+    {
+    }
+}

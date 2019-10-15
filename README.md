@@ -54,6 +54,32 @@ By default this package will only run in a local environment.
 
 Visit `/bench` in your local environment of your app to view the benchmark page.
 
+You can also run benchmarks as artisan command
+
+```bash
+php artisan bench:run
+```
+
+Use with passing benchmark class name
+
+```bash
+php artisan bench:run --benchmark=Benchmark\Class
+```
+
+To run all available benchmarks just issue
+
+```bash
+php artisan bench:run --all
+```
+
+To create a new command, use the bench:make Artisan command.
+
+```bash
+php artisan bench:make
+```
+
+This command will create a new benchmark class in the app/Benchmarks directory.
+
 ### Changelog
 
 Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
