@@ -105,8 +105,7 @@ class BenchRunCommand extends Command
             foreach ($benchmarks as $method => $benchmark) {
                 $benchmark  = collect($benchmark);
                 $subjects   = collect($benchmark['subjects']);
-                $percentage = (int) $benchmark['percent']['fastest']['time'] - 100;
-                $percentage = $percentage ? '+'.$percentage.'%' : $percentage.'%';
+                $percentage = '+'.(int) $benchmark['percent']['fastest']['time'].'%';
                 $time       = $subjects->pluck('time');
                 $total      = $total->merge($time);
 
