@@ -4,8 +4,6 @@ namespace Metallizzer\Bench;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
-use Metallizzer\Bench\Console\BenchMakeCommand;
-use Metallizzer\Bench\Console\BenchRunCommand;
 use Metallizzer\Bench\Http\Middleware\Authorize;
 
 class BenchServiceProvider extends ServiceProvider
@@ -22,14 +20,6 @@ class BenchServiceProvider extends ServiceProvider
         $this->app->singleton('bench', function ($app) {
             return new Bench($app);
         });
-
-        if ($this->app->runningInConsole()) {
-            $this->app->bind('command.bench:run', BenchRunCommand::class);
-            $this->app->bind('command.bench:make', BenchMakeCommand::class);
-
-            $this->commands(['command.bench:run']);
-            $this->commands(['command.bench:make']);
-        }
     }
 
     /**
@@ -37,12 +27,20 @@ class BenchServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->publishes([
-            dirname(__DIR__).'/config/bench.php' => config_path('bench.php'),
-        ], 'config');
-        $this->publishes([
-            dirname(__DIR__).'/public' => public_path('vendor/bench'),
-        ], 'bench-assets');
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                Console\BenchRunCommand::class,
+                Console\BenchMakeCommand::class,
+            ]);
+
+            $this->publishes([
+                dirname(__DIR__).'/config/bench.php' => config_path('bench.php'),
+            ], 'config');
+
+            $this->publishes([
+                dirname(__DIR__).'/public' => public_path('vendor/bench'),
+            ], 'bench-assets');
+        }
 
         $this->loadViewsFrom(dirname(__DIR__).'/resources/views', 'bench');
 
