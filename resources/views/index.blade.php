@@ -43,7 +43,7 @@
 
                                 <div class="d-sm-flex align-items-center justify-content-between @hasSection('content') mb-4 @endif">
                                     <form class="form-inline" action="{{ route('bench.run') }}" method="post">
-                                        @csrf
+                                        {{ csrf_field() }}
                                         <label class="my-1 mr-2" for="benchmark">Benchmark</label>
                                         <select class="custom-select my-1 mr-sm-2" id="benchmark" name="benchmark">
                                             <option value="">Choose benchmark</option>
