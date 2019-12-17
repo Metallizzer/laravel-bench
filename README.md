@@ -11,7 +11,7 @@ The metallizzer/laravel-bench package provides tool to compare different functio
 You can install the package via composer:
 
 ```bash
-composer require metallizzer/laravel-bench
+composer require --dev metallizzer/laravel-bench
 ```
 
 Next, you must publish the assets from this package.
